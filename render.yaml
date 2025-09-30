@@ -11,9 +11,9 @@ services:
       - key: NODE_ENV
         value: production
       - key: DATABASE_URL
-        value: postgresql://neondb_owner:npg_RX6iU4HOFnlf@ep-weathered-poetry-agcjfzqk-pooler.c-2.eu-central-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+        value: postgresql://neondb_owner:npg_RX6iU4HOFnlf@ep-green-frog-agxg4c9i-pooler.c-2.eu-central-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
       - key: DB_HOST
-        value: ep-weathered-poetry-agcjfzqk-pooler.c-2.eu-central-1.aws.neon.tech
+        value: ep-green-frog-agxg4c9i-pooler.c-2.eu-central-1.aws.neon.tech
       - key: DB_PORT
         value: 5432
       - key: DB_USERNAME
