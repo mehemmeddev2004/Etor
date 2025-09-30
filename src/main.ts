@@ -33,23 +33,30 @@ async function bootstrap() {
   );
   app.setGlobalPrefix('api');
 
-  const config = new DocumentBuilder()
-    .setTitle('Etor')
-    .setDescription('The Etor API description')
-    .setVersion('1.0')
-    .addBearerAuth()
-    .addTag('')
-    .build();
+  // Only enable Swagger in development
+  if (process.env.NODE_ENV !== 'production') {
+    const config = new DocumentBuilder()
+      .setTitle('Etor')
+      .setDescription('The Etor API description')
+      .setVersion('1.0')
+      .addBearerAuth()
+      .addTag('')
+      .build();
 
-  const document = SwaggerModule.createDocument(app, config);
+    const document = SwaggerModule.createDocument(app, config);
 
-  SwaggerModule.setup('docs', app, document, {
-    customCssUrl: `/swagger.dark.css`,
-    customSiteTitle: 'Etor API Docs',
-    swaggerOptions: {
-      filter: true,
-    },
-  });
+    SwaggerModule.setup('docs', app, document, {
+      customCssUrl: `/swagger.dark.css`,
+      customSiteTitle: 'Etor API Docs',
+      swaggerOptions: {
+        filter: true,
+      },
+    });
+    
+    console.log('📚 Swagger documentation available at: /docs');
+  } else {
+    console.log('📚 Swagger disabled in production mode');
+  }
 
     const port = process.env.PORT || 3001;
     await app.listen(port, '0.0.0.0');
