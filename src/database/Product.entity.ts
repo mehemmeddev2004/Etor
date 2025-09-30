@@ -10,12 +10,7 @@ import {
   OneToMany,
 } from 'typeorm';
 
-import { userEntity } from './user.entity';
-import { CategoryEntity } from './Category.entity';
-import { ProductSpec } from './Product-Spec.entity';
-import { ProductVariant } from './Product-variant.entity';
-import { PaymentEntity } from './Payment.entity';
-import { NewSeasonEntity } from './NewSeason.entity';
+// Removed all circular imports - using string references instead
 
 @Entity('product')
 export class ProductEntity {
@@ -50,40 +45,40 @@ description?: string[];
   @Column({ default: 0 })
   stock: number;
 
-  @OneToOne(() => NewSeasonEntity, (newSeason) => newSeason.product, {
+  @OneToOne('NewSeasonEntity', (newSeason: any) => newSeason.product, {
   cascade: true,
   nullable: true,
   })
   @JoinColumn()
-  newSeason?: NewSeasonEntity;
+  newSeason?: any;
 
 
-  @ManyToOne(() => CategoryEntity, category => category.products, {
+  @ManyToOne('CategoryEntity', (category: any) => category.products, {
     nullable: true,
     onDelete: 'SET NULL',
   })
-  category?: CategoryEntity;
+  category?: any;
   
-   @OneToMany(() => PaymentEntity, payment => payment.product)
-  payments: PaymentEntity[];
+   @OneToMany('PaymentEntity', (payment: any) => payment.product)
+  payments: any[];
 
-  @ManyToOne(() => userEntity, user => user.products, {
+  @ManyToOne('userEntity', (user: any) => user.products, {
     nullable: true,
     onDelete: 'SET NULL',
   })
-  user?: userEntity;
+  user?: any;
 
-  @OneToMany(() => ProductSpec, (spec) => spec.product, {
+  @OneToMany('ProductSpec', (spec: any) => spec.product, {
     cascade: true,
     eager: true,
   })
-  specs: ProductSpec[];
+  specs: any[];
 
-  @OneToMany(() => ProductVariant, variant => variant.product, {
+  @OneToMany('ProductVariant', (variant: any) => variant.product, {
     cascade: true,
     eager: true,
   })
-  variants: ProductVariant[];
+  variants: any[];
 
   @CreateDateColumn()
   createdAt: Date;

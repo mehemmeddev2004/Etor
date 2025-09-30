@@ -2,8 +2,8 @@ import { UserProvider, UserRole } from "src/shared/enum/user.enum";
 import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import * as bcrypt from 'bcrypt';
 // Circular dependency fix - use string reference instead of direct import
-import { ProductEntity } from "./Product.entity";
-import { PaymentEntity } from "./Payment.entity";
+// Removed circular imports - using string references instead
+// Removed circular import - using string reference instead
 
 
 @Entity('user')
@@ -36,8 +36,8 @@ export class userEntity {
     @JoinColumn()
     profile: any
 
-    @OneToMany(() => ProductEntity, product => product.user)
-    products: ProductEntity
+    @OneToMany('ProductEntity', (product: any) => product.user)
+    products: any
 
 
     @Column({
@@ -47,8 +47,8 @@ export class userEntity {
     })
     provider: UserProvider;
 
-    @OneToMany(() => PaymentEntity, payment => payment.user)
-    payments: PaymentEntity[];
+    @OneToMany('PaymentEntity', (payment: any) => payment.user)
+    payments: any[];
 
     @CreateDateColumn()
     createdAt: Date;
