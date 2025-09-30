@@ -61,7 +61,7 @@ import { UploadModule } from './modules/upload/upload.module';
         // Add common configuration
         Object.assign(dbConfig, {
           entities: [join(__dirname, '**', '*.entity{.ts,.js}')],
-          synchronize: process.env.NODE_ENV !== 'production',
+          synchronize: true, // Enable for initial table creation
           logging: process.env.NODE_ENV !== 'production',
           retryAttempts: 3,
           retryDelay: 2000,
