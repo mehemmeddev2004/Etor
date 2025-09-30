@@ -13,49 +13,15 @@ async function bootstrap() {
     app.useStaticAssets(join(__dirname, '..', '..', 'public'));
   
   // CORS configuration for production and development
-  const allowedOrigins = process.env.NODE_ENV === 'production' 
-    ? [
-        process.env.FRONTEND_URL || 'http://localhost:3000',
-        'https://etor-frontend.vercel.app',
-        'https://etor.vercel.app',
-        // Add any other production domains here
-      ]
-    : [
-        'http://localhost:3000', 
-        'http://localhost:3001', 
-        'http://localhost:3010',
-        'http://127.0.0.1:3000',
-        'http://127.0.0.1:3001',
-        'http://127.0.0.1:3010'
-      ];
 
   app.enableCors({
-    origin: (origin, callback) => {
-      // Allow requests with no origin (mobile apps, Postman, etc.)
-      if (!origin) return callback(null, true);
-      
-      // Check if origin is in allowed list
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-      
-      // For development, allow any localhost or 127.0.0.1
-      if (process.env.NODE_ENV !== 'production') {
-        if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
-          return callback(null, true);
-        }
-      }
-      
-      // For production, allow any vercel.app subdomain
-      if (process.env.NODE_ENV === 'production') {
-        if (origin.endsWith('.vercel.app')) {
-          return callback(null, true);
-        }
-      }
-      
-      console.log(`CORS blocked origin: ${origin}`);
-      callback(new Error('Not allowed by CORS'));
-    },
+    origin: [
+      'http://localhost:3000',
+      'https://coming-soon-woad-rho.vercel.app',
+      'https://etor-frontend.vercel.app',
+      'https://etor.vercel.app',
+      'https://coming-soon-etor.vercel.app'
+    ],
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
