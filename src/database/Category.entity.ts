@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { ProductEntity } from "./Product.entity";
+// Removed circular import - using string reference instead
 
 
 @Entity('Category')
@@ -21,8 +21,8 @@ export class CategoryEntity {
     @Column({ nullable: true })
     imageUrl: string
 
-    @OneToMany(() => ProductEntity, (product) => product.category)
-    products: ProductEntity[]
+    @OneToMany('ProductEntity', (product: any) => product.category)
+    products: any[]
 
     @ManyToOne(
         () => CategoryEntity,

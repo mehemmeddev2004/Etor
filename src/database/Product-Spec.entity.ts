@@ -6,7 +6,7 @@ import {
   JoinColumn,
   OneToMany
 } from 'typeorm';
-import { ProductEntity } from './Product.entity';
+// Removed circular import - using string reference instead
 // Removed circular import - using string reference instead
 
 @Entity('product_spec')
@@ -20,12 +20,12 @@ export class ProductSpec {
   @Column()
   name: string;
 
-  @ManyToOne(() => ProductEntity, (product) => product.specs, {
+  @ManyToOne('ProductEntity', (product: any) => product.specs, {
     onDelete: 'CASCADE',
     nullable: true,
   })
   @JoinColumn()
-  product: ProductEntity;
+  product: any;
 
   @Column({ nullable: true })
   productId: number;

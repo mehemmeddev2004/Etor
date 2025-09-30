@@ -1,5 +1,5 @@
 import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
-import { ProductEntity } from "./Product.entity";
+// Removed circular import - using string reference instead
 import { SeasonType } from "src/shared/enum/Seasson.enum";
 
 @Entity('new_season')
@@ -16,6 +16,6 @@ export class NewSeasonEntity {
   })
   seasonType: SeasonType;
 
-  @OneToOne(() => ProductEntity, (product) => product.newSeason)
-  product: ProductEntity;
+  @OneToOne('ProductEntity', (product: any) => product.newSeason)
+  product: any;
 }

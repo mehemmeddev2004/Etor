@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
-import { ProductVariant } from './Product-variant.entity';
+// Removed circular import - using string reference instead
 
 
 @Entity('product_variant_spec')
@@ -13,11 +13,11 @@ export class ProductVariantSpec {
   @Column()
   value: string;
 
-  @ManyToOne(() => ProductVariant, (variant) => variant.specs, {
+  @ManyToOne('ProductVariant', (variant: any) => variant.specs, {
     onDelete: 'CASCADE',
     nullable: true,
   })
-  productVariant?: ProductVariant;
+  productVariant?: any;
 
   @Column({ nullable: true })
   productVariantId?: number;

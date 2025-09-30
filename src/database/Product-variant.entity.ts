@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
-import { ProductVariantSpec } from './product-variant-spec.entity';
-import { ProductEntity } from './Product.entity';
+// Removed circular import - using string reference instead
+// Removed circular import - using string reference instead
 
 
 @Entity('product_variant')
@@ -23,16 +23,16 @@ export class ProductVariant {
   @Column("text", { array: true })
   images: string[];
 
-  @OneToMany(() => ProductVariantSpec, (spec) => spec.productVariant, {
+  @OneToMany('ProductVariantSpec', (spec: any) => spec.productVariant, {
     cascade: true,
   })
-  specs: ProductVariantSpec[];
+  specs: any[];
 
-  @ManyToOne(() => ProductEntity, (product) => product.variants, {
+  @ManyToOne('ProductEntity', (product: any) => product.variants, {
     onDelete: 'CASCADE',
     nullable: true,
   })
-  product?: ProductEntity;
+  product?: any;
 
   @Column({ nullable: true })
   productId?: number;

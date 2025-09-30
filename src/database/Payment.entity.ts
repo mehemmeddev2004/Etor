@@ -1,6 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne, OneToMany } from "typeorm";
-import { userEntity } from "./user.entity";
-import { ProductEntity } from "./Product.entity";
+// Removed circular imports - using string references instead
 
 @Entity('payments')
 export class PaymentEntity {
@@ -20,11 +19,11 @@ export class PaymentEntity {
   paid: boolean;
 
 
-  @ManyToOne(() => userEntity, user => user.payments) 
-  user: userEntity;
+  @ManyToOne('userEntity', (user: any) => user.payments) 
+  user: any;
 
-  @OneToMany(() => ProductEntity, product => product.payments)
-  product: ProductEntity
+  @OneToMany('ProductEntity', (product: any) => product.payments)
+  product: any
 
   @CreateDateColumn()
   createdAt: Date;
