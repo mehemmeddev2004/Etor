@@ -16,7 +16,14 @@ export class AppController {
       status: 'ok',
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
-      environment: process.env.NODE_ENV || 'development'
+      environment: process.env.NODE_ENV || 'development',
+      message: 'Application is running',
+      port: process.env.PORT || 3001
     };
+  }
+
+  @Get('ping')
+  ping() {
+    return { message: 'pong', timestamp: new Date().toISOString() };
   }
 }

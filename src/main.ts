@@ -7,7 +7,9 @@ import { join } from 'path';
 
 async function bootstrap() {
   try {
-    const app = await NestFactory.create<NestExpressApplication>(AppModule);
+    const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+      logger: ['error', 'warn', 'log'],
+    });
     app.useStaticAssets(join(__dirname, '..', '..', 'public'));
   
   // CORS configuration for production and development

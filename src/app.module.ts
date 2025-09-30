@@ -34,24 +34,41 @@ import { UploadModule } from './modules/upload/upload.module';
    TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        type: 'postgres',
-        host: config.get('DB_HOST'),
-        port: +config.get('DB_PORT'),
-        username: config.get('DB_USERNAME'),
-        password: config.get('DB_PASSWORD'),
-        database: config.get('DB_DATABASE'),
-        entities: [join(__dirname, '**', '*.entity{.ts,.js}')],
-        synchronize: process.env.NODE_ENV !== 'production',
-        logging: process.env.NODE_ENV !== 'production',
-        retryAttempts: 10,
-        retryDelay: 3000,
-        autoLoadEntities: true,
-        ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-        connectTimeoutMS: 60000,
-        acquireTimeoutMS: 60000,
-        timeout: 60000,
-      }),
+      useFactory: async (config: ConfigService) => {
+        const dbConfig = {
+          type: 'postgres' as const,
+          host: config.get('DB_HOST') || 'localhost',
+          port: +config.get('DB_PORT') || 5432,
+          username: config.get('DB_USERNAME') || 'postgres',
+          password: config.get('DB_PASSWORD') || '',
+          database: config.get('DB_DATABASE') || 'postgres',
+          entities: [join(__dirname, '**', '*.entity{.ts,.js}')],
+          synchronize: process.env.NODE_ENV !== 'production',
+          logging: process.env.NODE_ENV !== 'production',
+          retryAttempts: 3,
+          retryDelay: 2000,
+          autoLoadEntities: true,
+          ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+          connectTimeoutMS: 5000,
+          acquireTimeoutMS: 5000,
+          timeout: 5000,
+          keepConnectionAlive: true,
+          dropSchema: false,
+          migrationsRun: false,
+          extra: {
+            connectionLimit: 10,
+          },
+        };
+        
+        console.log('Database configuration:', {
+          host: dbConfig.host,
+          port: dbConfig.port,
+          database: dbConfig.database,
+          username: dbConfig.username
+        });
+        
+        return dbConfig;
+      },
     }),
     MailerModule.forRootAsync({
       imports: [ConfigModule],
