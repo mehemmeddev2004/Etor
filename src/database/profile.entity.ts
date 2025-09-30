@@ -13,7 +13,7 @@ export class ProfileEntiry{
     @Column({nullable: true})
     name: string
 
-     @OneToOne(() => userEntity, (user) => user.profile, {onDelete: 'CASCADE'})
-    user: userEntity
+     @OneToOne('userEntity', (user: any) => user.profile, {onDelete: 'CASCADE'})
+    user: any
 
 }
