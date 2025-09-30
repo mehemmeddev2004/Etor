@@ -14,14 +14,53 @@ async function bootstrap() {
   
   // CORS configuration for production and development
   const allowedOrigins = process.env.NODE_ENV === 'production' 
-    ? [process.env.FRONTEND_URL || 'https://your-frontend-domain.com']
-    : ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3010'];
+    ? [
+        process.env.FRONTEND_URL || 'http://localhost:3000',
+        'https://etor-frontend.vercel.app',
+        'https://etor.vercel.app',
+        // Add any other production domains here
+      ]
+    : [
+        'http://localhost:3000', 
+        'http://localhost:3001', 
+        'http://localhost:3010',
+        'http://127.0.0.1:3000',
+        'http://127.0.0.1:3001',
+        'http://127.0.0.1:3010'
+      ];
 
   app.enableCors({
-    origin: allowedOrigins,
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile apps, Postman, etc.)
+      if (!origin) return callback(null, true);
+      
+      // Check if origin is in allowed list
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      
+      // For development, allow any localhost or 127.0.0.1
+      if (process.env.NODE_ENV !== 'production') {
+        if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+          return callback(null, true);
+        }
+      }
+      
+      // For production, allow any vercel.app subdomain
+      if (process.env.NODE_ENV === 'production') {
+        if (origin.endsWith('.vercel.app')) {
+          return callback(null, true);
+        }
+      }
+      
+      console.log(`CORS blocked origin: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    },
+    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
     credentials: true,
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+    exposedHeaders: ['Content-Length', 'X-Foo', 'X-Bar'],
+    maxAge: 86400, // 24 hours
   });
 
   app.useGlobalPipes(
@@ -32,6 +71,19 @@ async function bootstrap() {
     }),
   );
   app.setGlobalPrefix('api');
+
+  // Add explicit OPTIONS handling for preflight requests
+  app.use((req, res, next) => {
+    if (req.method === 'OPTIONS') {
+      res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+      res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
+      res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
+      res.header('Access-Control-Allow-Credentials', 'true');
+      res.header('Access-Control-Max-Age', '86400');
+      return res.sendStatus(200);
+    }
+    next();
+  });
 
   // Only enable Swagger in development
   if (process.env.NODE_ENV !== 'production') {
