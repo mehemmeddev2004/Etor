@@ -24,6 +24,8 @@ services:
         value: neondb
       - key: JWT_SECRET
         generateValue: true
+      - key: STRIPE_SECRET_KEY
+        sync: false
       - key: FRONTEND_URL
         value: https://your-frontend-domain.com
       - key: CLOUDINARY_CLOUD_NAME
