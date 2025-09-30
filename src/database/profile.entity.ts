@@ -1,5 +1,6 @@
 import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { userEntity } from "./user.entity";
+// Circular dependency fix - use string reference instead of direct import
 
 @Entity('Profiles')
 export class ProfileEntiry{

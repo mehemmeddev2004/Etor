@@ -1,7 +1,7 @@
 import { UserProvider, UserRole } from "src/shared/enum/user.enum";
 import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import * as bcrypt from 'bcrypt';
-import { ProfileEntiry } from "./profile.entity";
+// Circular dependency fix - use string reference instead of direct import
 import { ProductEntity } from "./Product.entity";
 import { PaymentEntity } from "./Payment.entity";
 
@@ -32,9 +32,9 @@ export class userEntity {
     @Column({ nullable: true })
     providerId: string;
 
-    @OneToOne(() => ProfileEntiry, (profile) => profile.user, { cascade: true, onDelete: 'CASCADE' })
+    @OneToOne('ProfileEntiry', (profile: any) => profile.user, { cascade: true, onDelete: 'CASCADE' })
     @JoinColumn()
-    profile: ProfileEntiry
+    profile: any
 
     @OneToMany(() => ProductEntity, product => product.user)
     products: ProductEntity
