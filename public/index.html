@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Firebase Auth</title>
+</head>
+
+<body>
+    <button id="googleLogin">Sign in with Google</button>
+    <div id="status"></div>
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.3.0/firebase-app.js';
+        import { getAuth, GoogleAuthProvider, signInWithPopup } from 'https://www.gstatic.com/firebasejs/11.3.0/firebase-auth.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAICjJM4IcWNdnTH8wjpEQUNJqdbGMIgJE",
+            authDomain: "etor-e05df.firebaseapp.com",
+            projectId: "etor-e05df",
+            storageBucket: "etor-e05df.firebasestorage.app",
+            messagingSenderId: "888655254076",
+            appId: "1:888655254076:web:326e00e3480dcbfd136939",
+            measurementId: "G-MJ14NYL0LQ"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const googleProvider = new GoogleAuthProvider();
+
+        document.getElementById('googleLogin').addEventListener('click', async () => {
+            try {
+                const result = await signInWithPopup(auth, googleProvider);
+                const idToken = await result.user.getIdToken(/* forceRefresh */ true);
+                console.log('Firebase ID Token:', idToken);
+
+                const response = await fetch('http://localhost:3000/api/admin/login-firebase', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ token: idToken })
+                });
+
+                const data = await response.json();
+                console.log('Login response:', data);
+
+            } catch (error) {
+                console.error('Login error:', error);
+            }
+        });
+    </script>
+</body>
+
+</html>
