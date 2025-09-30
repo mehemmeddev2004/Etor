@@ -35,13 +35,31 @@ import { UploadModule } from './modules/upload/upload.module';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (config: ConfigService) => {
-        const dbConfig = {
-          type: 'postgres' as const,
-          host: config.get('DB_HOST') || 'localhost',
-          port: +config.get('DB_PORT') || 5432,
-          username: config.get('DB_USERNAME') || 'postgres',
-          password: config.get('DB_PASSWORD') || '',
-          database: config.get('DB_DATABASE') || 'postgres',
+        // Check if DATABASE_URL is provided (common in Render)
+        const databaseUrl = config.get('DATABASE_URL');
+        
+        let dbConfig;
+        
+        if (databaseUrl) {
+          // Parse DATABASE_URL
+          dbConfig = {
+            type: 'postgres' as const,
+            url: databaseUrl,
+          };
+        } else {
+          // Use individual environment variables
+          dbConfig = {
+            type: 'postgres' as const,
+            host: config.get('DB_HOST') || 'localhost',
+            port: +config.get('DB_PORT') || 5432,
+            username: config.get('DB_USERNAME') || 'postgres',
+            password: config.get('DB_PASSWORD') || '',
+            database: config.get('DB_DATABASE') || 'postgres',
+          };
+        }
+        
+        // Add common configuration
+        Object.assign(dbConfig, {
           entities: [join(__dirname, '**', '*.entity{.ts,.js}')],
           synchronize: process.env.NODE_ENV !== 'production',
           logging: process.env.NODE_ENV !== 'production',
@@ -58,7 +76,16 @@ import { UploadModule } from './modules/upload/upload.module';
           extra: {
             connectionLimit: 10,
           },
-        };
+        });
+        
+        console.log('Environment variables check:', {
+          NODE_ENV: process.env.NODE_ENV,
+          DB_HOST: process.env.DB_HOST,
+          DB_PORT: process.env.DB_PORT,
+          DB_USERNAME: process.env.DB_USERNAME,
+          DB_DATABASE: process.env.DB_DATABASE,
+          DATABASE_URL: process.env.DATABASE_URL
+        });
         
         console.log('Database configuration:', {
           host: dbConfig.host,
