@@ -3,12 +3,13 @@ import { MulterModule } from '@nestjs/platform-express';
 import { ConfigModule } from '@nestjs/config';
 import { UploadController } from './upload.controller';
 import { UploadService } from './upload.service';
+import { CloudinaryModule } from '../../libs/cloudinary/cloudinary.module';
 
 @Module({
   imports: [
     ConfigModule,
+    CloudinaryModule,
     MulterModule.register({
-      dest: './public/uploads',
       limits: {
         fileSize: 10 * 1024 * 1024, // 10MB
       },

@@ -167,19 +167,19 @@ export class UploadController {
     return await this.uploadService.uploadSingleFile(file);
   }
 
-  @Delete(':filename')
+  @Delete(':publicId')
   @ApiOperation({ summary: 'Delete an uploaded file' })
   @ApiResponse({ status: 200, description: 'File deleted successfully' })
   @ApiResponse({ status: 400, description: 'Bad request' })
-  async deleteFile(@Param('filename') filename: string) {
-    return await this.uploadService.deleteFile(filename);
+  async deleteFile(@Param('publicId') publicId: string) {
+    return await this.uploadService.deleteFile(publicId);
   }
 
-  @Get('info/:filename')
+  @Get('info/:publicId')
   @ApiOperation({ summary: 'Get file information' })
   @ApiResponse({ status: 200, description: 'File information retrieved successfully' })
-  async getFileInfo(@Param('filename') filename: string) {
-    return await this.uploadService.getFileInfo(filename);
+  async getFileInfo(@Param('publicId') publicId: string) {
+    return await this.uploadService.getFileInfo(publicId);
   }
 
   @Get('types')

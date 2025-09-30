@@ -10,7 +10,6 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { UserModule } from './modules/user/user.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { AuthModule } from './modules/auth/auth.module';
-import { JwtModule } from '@nestjs/jwt';
 import { forgetPasswordModule } from './modules/auth/forgetpassword/forgetpassword.module';
 import { FirebaseModule } from './libs/firebase/firebase.module';
 import { categoryModule } from './modules/category/category.module';
@@ -125,17 +124,6 @@ import { UploadModule } from './modules/upload/upload.module';
               strict: true,
             },
           },
-        };
-      },
-    }),
-    JwtModule.registerAsync({
-      global: true,
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory(config: ConfigService) {
-        return {
-          secret: config.get('JWT_SECRET'),
-          signOptions: { expiresIn: '1d' },
         };
       },
     }),

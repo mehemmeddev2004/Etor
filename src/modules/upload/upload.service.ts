@@ -1,16 +1,18 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as fs from 'fs';
-import * as path from 'path';
+import { CloudinaryService } from '../../libs/cloudinary/cloudinary.service';
 
 @Injectable()
 export class UploadService {
-  constructor(private configService: ConfigService) {}
+  constructor(
+    private configService: ConfigService,
+    private cloudinaryService: CloudinaryService
+  ) {}
 
   /**
    * Handle single file upload
    */
-  async uploadSingleFile(file: Express.Multer.File): Promise<{ url: string; filename: string; size: number }> {
+  async uploadSingleFile(file: Express.Multer.File): Promise<{ url: string; filename: string; size: number; publicId: string }> {
     if (!file) {
       throw new BadRequestException('No file provided');
     }
@@ -21,59 +23,57 @@ export class UploadService {
       throw new BadRequestException('File size exceeds 10MB limit');
     }
 
-    // Generate unique filename
-    const fileExtension = path.extname(file.originalname);
-    const filename = `${Date.now()}-${Math.round(Math.random() * 1E9)}${fileExtension}`;
-    
-    // Create uploads directory if it doesn't exist
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads');
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
+    try {
+      // Upload to Cloudinary
+      const result = await this.cloudinaryService.uploadImage(file, 'uploads');
+      
+      if (!result || !result.secure_url) {
+        throw new InternalServerErrorException('Failed to upload file to cloud storage');
+      }
+
+      return {
+        url: result.secure_url,
+        filename: result.public_id,
+        size: file.size,
+        publicId: result.public_id
+      };
+    } catch (error) {
+      console.error('Upload error:', error);
+      throw new InternalServerErrorException('Failed to upload file');
     }
-
-    // Save file
-    const filePath = path.join(uploadDir, filename);
-    fs.writeFileSync(filePath, file.buffer);
-
-    return {
-      url: `/uploads/${filename}`,
-      filename: filename,
-      size: file.size
-    };
   }
 
   /**
    * Handle multiple files upload
    */
-  async uploadMultipleFiles(files: Express.Multer.File[]): Promise<Array<{ url: string; filename: string; size: number }>> {
+  async uploadMultipleFiles(files: Express.Multer.File[]): Promise<Array<{ url: string; filename: string; size: number; publicId: string }>> {
     if (!files || files.length === 0) {
       throw new BadRequestException('No files provided');
     }
 
-    const uploadedFiles: Array<{ url: string; filename: string; size: number }> = [];
-    
-    for (const file of files) {
-      const result = await this.uploadSingleFile(file);
-      uploadedFiles.push(result);
+    try {
+      const uploadPromises = files.map(file => this.uploadSingleFile(file));
+      return await Promise.all(uploadPromises);
+    } catch (error) {
+      console.error('Multiple upload error:', error);
+      throw new InternalServerErrorException('Failed to upload files');
     }
-
-    return uploadedFiles;
   }
 
   /**
    * Delete uploaded file
    */
-  async deleteFile(filename: string): Promise<{ success: boolean; message: string }> {
+  async deleteFile(publicId: string): Promise<{ success: boolean; message: string }> {
     try {
-      const filePath = path.join(process.cwd(), 'public', 'uploads', filename);
+      const result = await this.cloudinaryService.deleteImage(publicId);
       
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
+      if (result.result === 'ok') {
         return { success: true, message: 'File deleted successfully' };
       } else {
-        return { success: false, message: 'File not found' };
+        return { success: false, message: 'File not found or could not be deleted' };
       }
     } catch (error) {
+      console.error('Delete error:', error);
       throw new BadRequestException('Error deleting file');
     }
   }
@@ -81,21 +81,21 @@ export class UploadService {
   /**
    * Get file info
    */
-  async getFileInfo(filename: string): Promise<{ exists: boolean; size?: number; path?: string }> {
+  async getFileInfo(publicId: string): Promise<{ exists: boolean; size?: number; url?: string }> {
     try {
-      const filePath = path.join(process.cwd(), 'public', 'uploads', filename);
+      const result = await this.cloudinaryService.getImageDetails(publicId);
       
-      if (fs.existsSync(filePath)) {
-        const stats = fs.statSync(filePath);
+      if (result) {
         return {
           exists: true,
-          size: stats.size,
-          path: `/uploads/${filename}`
+          size: result.bytes,
+          url: result.secure_url
         };
       } else {
         return { exists: false };
       }
     } catch (error) {
+      console.error('Get file info error:', error);
       return { exists: false };
     }
   }
