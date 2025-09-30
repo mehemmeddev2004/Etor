@@ -7,7 +7,7 @@ import {
   OneToMany
 } from 'typeorm';
 import { ProductEntity } from './Product.entity';
-import { ProductSpecValue } from './Product-spec-value.entity';
+// Removed circular import - using string reference instead
 
 @Entity('product_spec')
 export class ProductSpec {
@@ -30,9 +30,9 @@ export class ProductSpec {
   @Column({ nullable: true })
   productId: number;
 
-  @OneToMany(() => ProductSpecValue, (value) => value.productSpec, {
+  @OneToMany('ProductSpecValue', (value: any) => value.productSpec, {
     cascade: true,
     eager: true,
   })
-  values: ProductSpecValue[];
+  values: any[];
 }

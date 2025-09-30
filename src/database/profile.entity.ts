@@ -1,5 +1,5 @@
 import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
-import { userEntity } from "./user.entity";
+// Removed circular import - using string reference instead
 // Circular dependency fix - use string reference instead of direct import
 
 @Entity('Profiles')
