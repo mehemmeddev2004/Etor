@@ -17,7 +17,7 @@ import { categoryModule } from './modules/category/category.module';
 import { ProfileModule } from './modules/user/profile/profile.module';
 import { ProductController } from './modules/products/product.controller';
 import { ProductModule } from './modules/products/product.module';
-import { PaymentModule } from './modules/payment/payment.module';
+
 import { NewSeassonModule } from './modules/NewSeasson/NewSeasson.module';
 import { UploadModule } from './modules/upload/upload.module';
 
@@ -150,7 +150,7 @@ import { UploadModule } from './modules/upload/upload.module';
     FirebaseModule,
     categoryModule,
     ProductModule,
-    PaymentModule,
+
     NewSeassonModule,
     UploadModule
   ],
