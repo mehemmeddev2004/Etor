@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException, Logger } from "@nestjs/common";
 import { InjectDataSource } from "@nestjs/typeorm";
 import { DataSource, Repository } from "typeorm";
 
@@ -11,6 +11,7 @@ import { SeasonType } from "src/shared/enum/Seasson.enum";
 
 @Injectable()
 export class NewSeasonService {
+  private readonly logger = new Logger(NewSeasonService.name);
   private newSeasonRepo: Repository<NewSeasonEntity>;
   private productRepo: Repository<ProductEntity>;
 
@@ -82,14 +83,37 @@ export class NewSeasonService {
   }
 
   async remove(id: number) {
-    const season = await this.newSeasonRepo.findOne({ where: { id } });
+    const season = await this.newSeasonRepo.findOne({ 
+      where: { id },
+      relations: ["product"]
+    });
     if (!season) throw new NotFoundException("New season not found");
 
-    await this.newSeasonRepo.remove(season);
+    try {
+      this.logger.log(`Attempting to delete NewSeason with ID: ${id}`);
+      
+      // First, remove the foreign key reference from any products that reference this season
+      const updateResult = await this.productRepo
+        .createQueryBuilder()
+        .update(ProductEntity)
+        .set({ newSeason: () => "NULL" })
+        .where("newSeasonId = :seasonId", { seasonId: id })
+        .execute();
 
-    return {
-      message: "New season deleted successfully",
-      id,
-    };
+      this.logger.log(`Updated ${updateResult.affected} products to remove NewSeason reference`);
+
+      // Now safely remove the season
+      await this.newSeasonRepo.remove(season);
+      
+      this.logger.log(`Successfully deleted NewSeason with ID: ${id}`);
+
+      return {
+        message: "New season deleted successfully",
+        id,
+      };
+    } catch (error) {
+      this.logger.error(`Failed to delete NewSeason with ID: ${id}`, error.stack);
+      throw error;
+    }
   }
 }
