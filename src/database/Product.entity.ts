@@ -42,12 +42,6 @@ description?: string[];
   @Column({ default: true })
   isActive: boolean;
 
-  @Column({ nullable: true })
-  brand?: string;
-
-  
-
-  
   @Column({ default: 0 })
   stock: number;
 
