@@ -43,7 +43,7 @@ description?: string[];
   isActive: boolean;
 
   @Column({ nullable: true })
-  brand?: string
+  brand?: string;
 
   
 
